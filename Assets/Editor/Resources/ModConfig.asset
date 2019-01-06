@@ -16,6 +16,8 @@ MonoBehaviour:
   description: 'By barking with text-to-speech on, the dog accidentally programmed
     a module.
 
+    Module by DVD. Based off of "Complex Keypads" module by AAces.
+
 
     moduleID: unrelatedAnagrams'
   version: 1.0
