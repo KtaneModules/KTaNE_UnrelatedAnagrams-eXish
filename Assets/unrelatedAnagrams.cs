@@ -29,6 +29,7 @@ public class unrelatedAnagrams : MonoBehaviour
     private bool _isSolved = false, _lightsOn = false;
     public int[] buttonNumbers = new int[9];
     public string[] buttonStrings = new string[9];
+    public bool[] buttonStates = new bool[9];
 
     private KMBombInfoExtensions.KnownPortType[] ports = new KMBombInfoExtensions.KnownPortType[6] { KMBombInfoExtensions.KnownPortType.DVI, KMBombInfoExtensions.KnownPortType.Parallel, KMBombInfoExtensions.KnownPortType.PS2, KMBombInfoExtensions.KnownPortType.RJ45, KMBombInfoExtensions.KnownPortType.Serial, KMBombInfoExtensions.KnownPortType.StereoRCA };
 
@@ -158,9 +159,7 @@ public class unrelatedAnagrams : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             buttonStrings[i] = letters[buttonNumbers[i]];
-        }
-        for (int i = 0; i < 9; i++)
-        {
+			buttonStates[i] = false;
             btn[i].GetComponentInChildren<TextMesh>().text = buttonStrings[i];
         }
 
@@ -252,7 +251,7 @@ public class unrelatedAnagrams : MonoBehaviour
 			}
 			if (info.GetPortCount() % 2 == 1)
 			{
-				Debug.LogFormat("[Unrelated Anagrams #{0}] Port count id odd ({1}). Reversing sequence.", _moduleId, info.GetPortCount());
+				Debug.LogFormat("[Unrelated Anagrams #{0}] Port count is odd ({1}). Reversing sequence.", _moduleId, info.GetPortCount());
 				buttonPressOrder = new[] {buttonPressOrder[8], buttonPressOrder[7], buttonPressOrder[6], buttonPressOrder[5], buttonPressOrder[4], buttonPressOrder[3], buttonPressOrder[2], buttonPressOrder[1], buttonPressOrder[0]};
 			}
             Debug.LogFormat("[Unrelated Anagrams #{0}] Sequence: {1}{2}{3}{4}{5}{6}{7}{8}{9}", _moduleId, buttonPressOrder[0], buttonPressOrder[1], buttonPressOrder[2], buttonPressOrder[3], buttonPressOrder[4], buttonPressOrder[5], buttonPressOrder[6], buttonPressOrder[7], buttonPressOrder[8]);
@@ -269,9 +268,10 @@ public class unrelatedAnagrams : MonoBehaviour
         newAudio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btn[btnIndex].transform);
         if (!_lightsOn || _isSolved) return;
 
-        if(buttonPressOrder[pressIndex] == buttonStrings[btnIndex])
+        if(buttonPressOrder[pressIndex] == buttonStrings[btnIndex] && !buttonStates[btnIndex])
         {
             pressIndex++;
+			buttonStates[btnIndex] = true;
             leds[btnIndex].material = green;
             Debug.LogFormat("[Unrelated Anagrams #{0}] Correct button pressed. Input received: button {1} at index {2}.",_moduleId, buttonStrings[btnIndex], btnIndex);
         } else
@@ -300,12 +300,13 @@ public class unrelatedAnagrams : MonoBehaviour
         for (int i = 0; i < 9; i++)
         {
             leds[i].material = red;
+			buttonStates[i] = false;
         }
         yield return new WaitForSeconds(2.0f);
         resetGame();
     }
 #pragma warning disable 414
-	private string TwitchHelpMessage = "Use !{0} press TL TM TR to press the top left button, the top middle button or the top right button. You can also use numbers, the keys are numbered in reading order starting from 1";
+	private string TwitchHelpMessage = "Use !{0} press RAD TUNE to press the buttons with the respective letters. You can also use numbers, the keys are numbered in reading order starting from 1";
 #pragma warning restore 414
 	public KMSelectable[] ProcessTwitchCommand(string command)
 	{
@@ -313,55 +314,27 @@ public class unrelatedAnagrams : MonoBehaviour
 		if (!command.StartsWith("PRESS")) return null;
 
 		command = command.Substring(6);
-		string[] parts = command.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-		bool NoSpace = false;
-		if (parts.Length == 1)
-			NoSpace = true;
 		List<int> ButtonsPressed = new List<int> { };
 		List<KMSelectable> Buttons = new List<KMSelectable> { };
-		if (Regex.IsMatch(command, "((T|M|B)(L|M|R) )+"))
+		if (Regex.IsMatch(command, "([UNDERTAL]\\s*)+"))
 		{
-			if (NoSpace) return null;
-			foreach (string part in parts)
+			foreach (Match buttonIndexString in Regex.Matches(command, "[UNDERTAL]"))
 			{
-				int num = 0;
-				switch (part)
+				int buttonIndex = 0;
+				while (buttonIndexString.Value != buttonStrings[buttonIndex] || ButtonsPressed.Contains(buttonIndex) || buttonStates[buttonIndex])
 				{
-					case "TL":
-						num = 0;
-						break;
-					case "TM":
-						num = 1;
-						break;
-					case "TR":
-						num = 2;
-						break;
-					case "ML":
-						num = 3;
-						break;
-					case "MM":
-						num = 4;
-						break;
-					case "MR":
-						num = 5;
-						break;
-					case "BL":
-						num = 6;
-						break;
-					case "BM":
-						num = 7;
-						break;
-					case "BR":
-						num = 8;
-						break;
+					if (++buttonIndex == 9) break;
 				}
-				if (ButtonsPressed.Contains(num)) continue;
 
-				ButtonsPressed.Add(num);
-				Buttons.Add(btn[num]);
+				if (buttonIndex >= 0 && buttonIndex < 9)
+				{
+					ButtonsPressed.Add(buttonIndex);
+					Buttons.Add(btn[buttonIndex]);
+				}
 			}
 
-			return Buttons.ToArray();
+			if (Buttons.Count == 0) return null;
+			else return Buttons.ToArray();
 		} else
 		{
 			foreach (Match buttonIndexString in Regex.Matches(command, "[1-9]"))
