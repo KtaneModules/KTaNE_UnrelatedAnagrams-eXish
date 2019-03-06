@@ -31,7 +31,7 @@ public class unrelatedAnagrams : MonoBehaviour
     public string[] buttonStrings = new string[9];
     public bool[] buttonStates = new bool[9];
 
-    private KMBombInfoExtensions.KnownPortType[] ports = new KMBombInfoExtensions.KnownPortType[6] { KMBombInfoExtensions.KnownPortType.DVI, KMBombInfoExtensions.KnownPortType.Parallel, KMBombInfoExtensions.KnownPortType.PS2, KMBombInfoExtensions.KnownPortType.RJ45, KMBombInfoExtensions.KnownPortType.Serial, KMBombInfoExtensions.KnownPortType.StereoRCA };
+    private KMBombInfoExtensions.KnownPortType[] circularPorts = new KMBombInfoExtensions.KnownPortType[4] { KMBombInfoExtensions.KnownPortType.PS2, KMBombInfoExtensions.KnownPortType.StereoRCA, KMBombInfoExtensions.KnownPortType.ComponentVideo, KMBombInfoExtensions.KnownPortType.CompositeVideo };
 
     int initialTime = 0;
     int pressIndex = 0;
@@ -202,10 +202,10 @@ public class unrelatedAnagrams : MonoBehaviour
             buttonPressOrder = new[] {"E", "L", "D", "E", "R", "A", "U", "N", "T"};
             Debug.LogFormat("[Unrelated Anagrams #{0}] Initial time: {1}. Initial sequence: ELDER AUNT", _moduleId, initialTime);
         }
-        else if (info.GetPortCount(ports[2]) + info.GetPortCount(ports[5]) * 2 > 2)
+        else if (info.GetPortCount(circularPorts[0]) + info.GetPortCount(circularPorts[1]) * 2 + info.GetPortCount(circularPorts[2]) * 3 + info.GetPortCount(circularPorts[3]) > 2)
         {
             buttonPressOrder = new[] {"N", "U", "T", "L", "E", "A", "D", "E", "R"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] PS/2 ports: {1}, Stereo RCA ports: {2}. Initial sequence: NUT LEADER", _moduleId, info.GetPortCount(ports[2]), info.GetPortCount(ports[5]));
+            Debug.LogFormat("[Unrelated Anagrams #{0}] PS/2 ports: {1}, Stereo RCA ports: {2}, Component Video ports: {3}, Composite Video ports: {4}. Initial sequence: NUT LEADER", _moduleId, info.GetPortCount(circularPorts[0]), info.GetPortCount(circularPorts[1]), info.GetPortCount(circularPorts[2]), info.GetPortCount(circularPorts[3]));
         }
         else if (info.GetSerialNumber().Contains("D") || info.GetSerialNumber().Contains("E"))
         {
