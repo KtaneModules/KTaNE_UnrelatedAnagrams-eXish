@@ -93,17 +93,13 @@ public class unrelatedAnagrams : MonoBehaviour
         letters[7] = "E";
         letters[8] = "D";
         
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 6; i++)
         {
-            if (info.GetSerialNumber().Contains(letters[i]))
+            string temp = "" + info.GetSerialNumber().ElementAt(i);
+            if (letters.Contains(temp))
             {
                 serialBobCondition++;
             }
-        }
-        //"E" is counted twice, so that needs to be fixed:
-        if (info.GetSerialNumber().Contains("E"))
-        {
-            serialBobCondition--;
         }
     }
     
@@ -308,9 +304,9 @@ public class unrelatedAnagrams : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
         resetGame();
     }
-#pragma warning disable 414
+    #pragma warning disable 414
     private string TwitchHelpMessage = "Use !{0} press RAD TUNE to press the buttons with the respective letters. You can also use numbers, the keys are numbered in reading order starting from 1";
-#pragma warning restore 414
+    #pragma warning restore 414
     public KMSelectable[] ProcessTwitchCommand(string command)
     {
         command = command.Trim().ToUpperInvariant();
