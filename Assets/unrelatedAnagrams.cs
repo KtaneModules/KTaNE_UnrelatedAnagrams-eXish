@@ -18,7 +18,7 @@ public class unrelatedAnagrams : MonoBehaviour
     public MeshRenderer[] leds;
     public string[] letters;
     public string[] buttonPressOrder;
-    
+
     public Material off;
     public Material green;
     public Material red;
@@ -55,7 +55,7 @@ public class unrelatedAnagrams : MonoBehaviour
                 handlePress(j);
                 return false;
             };
-        }       
+        }
     }
 
     void Activate()
@@ -92,7 +92,7 @@ public class unrelatedAnagrams : MonoBehaviour
         letters[6] = "T";
         letters[7] = "E";
         letters[8] = "D";
-        
+
         for (int i = 0; i < 6; i++)
         {
             string temp = "" + info.GetSerialNumber().ElementAt(i);
@@ -102,8 +102,8 @@ public class unrelatedAnagrams : MonoBehaviour
             }
         }
     }
-    
-    
+
+
     void setupButtons()
     {
         buttonNumbers[0] = UnityEngine.Random.Range(0, 9);
@@ -156,11 +156,11 @@ public class unrelatedAnagrams : MonoBehaviour
             btn[i].GetComponentInChildren<TextMesh>().text = buttonStrings[i];
         }
 
-        
+
     }
     void setupPressOrder()
     {
-        
+
         bobActive = false;
         if (info.GetOffIndicators().ToList().Contains("BOB") && serialBobCondition > 1)
         {
@@ -213,7 +213,7 @@ public class unrelatedAnagrams : MonoBehaviour
             buttonPressOrder = new[] {"U", "N", "R", "E", "L", "A", "T", "E", "D"};
             Debug.LogFormat("[Unrelated Anagrams #{0}] None of the conditions apply. Initial sequence: UNRELATED", _moduleId);
         }
-        
+
         if (!bobActive)
         {
             if (info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.AA) > 0)
@@ -259,14 +259,15 @@ public class unrelatedAnagrams : MonoBehaviour
     void handlePress(int btnIndex)
     {
         newAudio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btn[btnIndex].transform);
+        btn[btnIndex].AddInteractionPunch(.5f);
         if (!_lightsOn || _isSolved) return;
-        
+
         if (!_pressOrderSet)
         {
             setupPressOrder();
             _pressOrderSet = true;
         }
-        
+
         if (buttonPressOrder[pressIndex] == buttonStrings[btnIndex] && !buttonStates[btnIndex])
         {
             pressIndex++;
@@ -289,9 +290,9 @@ public class unrelatedAnagrams : MonoBehaviour
         if (pressIndex == 9)
         {
             module.HandlePass();
+            newAudio.PlaySoundAtTransform(UnityEngine.Random.Range(0,100) != 0 ? "solve" : "ohyes", transform);
             _isSolved = true;
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Module solved!",_moduleId);
-            newAudio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, btn[btnIndex].transform);
+            Debug.LogFormat("[Unrelated Anagrams #{0}] Module solved!", _moduleId);
         }
     }
     IEnumerator RedLights()
