@@ -37,6 +37,7 @@ public class unrelatedAnagrams : MonoBehaviour
     int pressIndex = 0;
     int serialBobCondition = 0;
     bool bobActive = false;
+    bool canInteract = true;
 
     void Start()
     {
@@ -260,7 +261,7 @@ public class unrelatedAnagrams : MonoBehaviour
     {
         newAudio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btn[btnIndex].transform);
         btn[btnIndex].AddInteractionPunch(.5f);
-        if (!_lightsOn || _isSolved) return;
+        if (!_lightsOn || _isSolved || !canInteract) return;
 
         if (!_pressOrderSet)
         {
@@ -297,6 +298,7 @@ public class unrelatedAnagrams : MonoBehaviour
     }
     IEnumerator RedLights()
     {
+        canInteract = false;
         for (int i = 0; i < 9; i++)
         {
             leds[i].material = red;
@@ -304,6 +306,7 @@ public class unrelatedAnagrams : MonoBehaviour
         }
         yield return new WaitForSeconds(2.0f);
         resetGame();
+        canInteract = true;
     }
     #pragma warning disable 414
     private string TwitchHelpMessage = "Use !{0} press RAD TUNE to press the buttons with the respective letters. You can also use numbers, the keys are numbered in reading order starting from 1";
