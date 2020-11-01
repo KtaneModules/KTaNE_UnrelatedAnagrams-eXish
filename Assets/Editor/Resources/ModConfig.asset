@@ -13,11 +13,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: unrelatedAnagrams
   title: Unrelated Anagrams
+  author: DVD, eXish
   description: "By barking with text-to-speech on, the dog accidentally programmed
     a module.\nModule by DVD, maintained by eXish. Based off of \"Complex Keypads\"
     module by AAces.\n\nmoduleID: unrelatedAnagrams\r\n\nTwitch Plays Supported\n\nManual
     [HTML]: https://ktane.timwi.de/HTML/Unrelated%20Anagrams.html\r\nManual [PDF]:
     https://ktane.timwi.de/PDF/Unrelated%20Anagrams.pdf"
-  version: 1.2
+  version: 1.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 2221d216d0ae059469df750efd65c4f7, type: 3}

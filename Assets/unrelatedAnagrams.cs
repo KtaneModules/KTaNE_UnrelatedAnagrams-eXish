@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
-using Newtonsoft.Json;
-using KMHelper;
-using System;
-using System.Threading;
+using KModkit;
 using UnityEngine;
+using System;
 
 public class unrelatedAnagrams : MonoBehaviour
 {
@@ -30,8 +28,6 @@ public class unrelatedAnagrams : MonoBehaviour
     public int[] buttonNumbers = new int[9];
     public string[] buttonStrings = new string[9];
     public bool[] buttonStates = new bool[9];
-
-    private KMBombInfoExtensions.KnownPortType[] circularPorts = new KMBombInfoExtensions.KnownPortType[4] { KMBombInfoExtensions.KnownPortType.PS2, KMBombInfoExtensions.KnownPortType.StereoRCA, KMBombInfoExtensions.KnownPortType.ComponentVideo, KMBombInfoExtensions.KnownPortType.CompositeVideo };
 
     int initialTime = 0;
     int pressIndex = 0;
@@ -159,7 +155,7 @@ public class unrelatedAnagrams : MonoBehaviour
 
 
     }
-    void setupPressOrder()
+    void setupPressOrder(bool log)
     {
 
         bobActive = false;
@@ -167,61 +163,71 @@ public class unrelatedAnagrams : MonoBehaviour
         {
             bobActive = true;
             buttonPressOrder = new[] {"U", "N", "R", "E", "L", "A", "T", "E", "D"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Unlit BOB found, serial number: {1}. Sequence: UNRELATED", _moduleId, info.GetSerialNumber());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Unlit BOB found, serial number: {1}. Sequence: UNRELATED", _moduleId, info.GetSerialNumber());
         }
         else if (info.GetOnIndicators().ToList().Count() > 2)
         {
             buttonPressOrder = new[] {"U", "N", "D", "E", "R", "T", "A", "L", "E"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Lit indicator count: {1}. Initial sequence: UNDERTALE", _moduleId, info.GetOnIndicators().ToList().Count());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Lit indicator count: {1}. Initial sequence: UNDERTALE", _moduleId, info.GetOnIndicators().ToList().Count());
         }
         else if (info.GetOffIndicators().ToList().Count() > 2)
         {
             buttonPressOrder = new[] {"D", "E", "L", "T", "A", "R", "U", "N", "E"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Unlit indicator count: {1}. Initial sequence: DELTARUNE", _moduleId, info.GetOffIndicators().ToList().Count());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Unlit indicator count: {1}. Initial sequence: DELTARUNE", _moduleId, info.GetOffIndicators().ToList().Count());
         }
         else if (info.GetSolvedModuleNames().Count() == 8)
         {
             buttonPressOrder = new[] {"N", "U", "D", "E", "A", "L", "E", "R", "T"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Solved module count: 8. Initial sequence: NUDE ALERT", _moduleId);
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Solved module count: 8. Initial sequence: NUDE ALERT", _moduleId);
         }
         else if (info.GetModuleNames().Count() < 6)
         {
             buttonPressOrder = new[] {"A", "N", "T", "D", "U", "E", "L", "E", "R"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Module count: {1}. Initial sequence: ANT DUELER", _moduleId, info.GetModuleNames().Count());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Module count: {1}. Initial sequence: ANT DUELER", _moduleId, info.GetModuleNames().Count());
         }
         else if (info.GetModuleNames().Count() - info.GetSolvableModuleNames().Count() > 1 || info.GetTime() <= 60)
         {
             buttonPressOrder = new[] {"U", "L", "T", "R", "A", "N", "E", "E", "D"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Needy module count: {1}, time left: {2}. Initial sequence: ULTRA NEED", _moduleId, info.GetModuleNames().Count() - info.GetSolvableModuleNames().Count(), info.GetTime());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Needy module count: {1}, time left: {2}. Initial sequence: ULTRA NEED", _moduleId, info.GetModuleNames().Count() - info.GetSolvableModuleNames().Count(), info.GetTime());
         }
         else if (initialTime >= 600)
         {
             buttonPressOrder = new[] {"E", "L", "D", "E", "R", "A", "U", "N", "T"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Initial time: {1}. Initial sequence: ELDER AUNT", _moduleId, initialTime);
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Initial time: {1}. Initial sequence: ELDER AUNT", _moduleId, initialTime);
         }
-        else if (info.GetPortCount(circularPorts[0]) + info.GetPortCount(circularPorts[1]) * 2 + info.GetPortCount(circularPorts[2]) * 3 + info.GetPortCount(circularPorts[3]) > 2)
+        else if (info.GetPortCount(Port.PS2) + info.GetPortCount(Port.StereoRCA) * 2 + info.GetPortCount(Port.ComponentVideo) * 3 + info.GetPortCount(Port.CompositeVideo) > 2)
         {
             buttonPressOrder = new[] {"N", "U", "T", "L", "E", "A", "D", "E", "R"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] PS/2 ports: {1}, Stereo RCA ports: {2}, Component Video ports: {3}, Composite Video ports: {4}. Initial sequence: NUT LEADER", _moduleId, info.GetPortCount(circularPorts[0]), info.GetPortCount(circularPorts[1]), info.GetPortCount(circularPorts[2]), info.GetPortCount(circularPorts[3]));
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] PS/2 ports: {1}, Stereo RCA ports: {2}, Component Video ports: {3}, Composite Video ports: {4}. Initial sequence: NUT LEADER", _moduleId, info.GetPortCount(Port.PS2), info.GetPortCount(Port.StereoRCA), info.GetPortCount(Port.ComponentVideo), info.GetPortCount(Port.CompositeVideo));
         }
         else if (info.GetSerialNumber().Contains("D") || info.GetSerialNumber().Contains("E"))
         {
             buttonPressOrder = new[] {"N", "E", "U", "T", "R", "A", "L", "E", "D"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Serial number: {1}. Initial sequence: NEUTRAL ED", _moduleId, info.GetSerialNumber());
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Serial number: {1}. Initial sequence: NEUTRAL ED", _moduleId, info.GetSerialNumber());
         }
         else
         {
             buttonPressOrder = new[] {"U", "N", "R", "E", "L", "A", "T", "E", "D"};
-            Debug.LogFormat("[Unrelated Anagrams #{0}] None of the conditions apply. Initial sequence: UNRELATED", _moduleId);
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] None of the conditions apply. Initial sequence: UNRELATED", _moduleId);
         }
 
         if (!bobActive)
         {
-            if (info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.AA) > 0)
+            if (info.GetBatteryCount(Battery.AA) > 0 && log)
             {
-                Debug.LogFormat("[Unrelated Anagrams #{0}] AA Battery count: {1}. Right shifting sequence {1} times.", _moduleId, info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.AA));
+                Debug.LogFormat("[Unrelated Anagrams #{0}] AA Battery count: {1}. Right shifting sequence {1} times.", _moduleId, info.GetBatteryCount(Battery.AA));
             }
-            for (int aa = 0; aa < info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.AA); aa++)
+            for (int aa = 0; aa < info.GetBatteryCount(Battery.AA); aa++)
             {
                 string lastButton = buttonPressOrder[8];
                 for (int i = 8; i > 0; i--)
@@ -230,11 +236,11 @@ public class unrelatedAnagrams : MonoBehaviour
                 }
                 buttonPressOrder[0] = lastButton;
             }
-            if (info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.D) > 0)
+            if (info.GetBatteryCount(Battery.D) > 0 && log)
             {
-                Debug.LogFormat("[Unrelated Anagrams #{0}] D Battery count: {1}. Left shifting sequence {1} times.", _moduleId, info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.D));
+                Debug.LogFormat("[Unrelated Anagrams #{0}] D Battery count: {1}. Left shifting sequence {1} times.", _moduleId, info.GetBatteryCount(Battery.D));
             }
-            for (int d = 0; d < info.GetBatteryCount(KMBombInfoExtensions.KnownBatteryType.D); d++)
+            for (int d = 0; d < info.GetBatteryCount(Battery.D); d++)
             {
                 string firstButton = buttonPressOrder[0];
                 for (int i = 0; i < 8; i++)
@@ -245,10 +251,12 @@ public class unrelatedAnagrams : MonoBehaviour
             }
             if (info.GetPortCount() % 2 == 1)
             {
-                Debug.LogFormat("[Unrelated Anagrams #{0}] Port count is odd ({1}). Reversing sequence.", _moduleId, info.GetPortCount());
+                if (log)
+                    Debug.LogFormat("[Unrelated Anagrams #{0}] Port count is odd ({1}). Reversing sequence.", _moduleId, info.GetPortCount());
                 buttonPressOrder = new[] {buttonPressOrder[8], buttonPressOrder[7], buttonPressOrder[6], buttonPressOrder[5], buttonPressOrder[4], buttonPressOrder[3], buttonPressOrder[2], buttonPressOrder[1], buttonPressOrder[0]};
             }
-            Debug.LogFormat("[Unrelated Anagrams #{0}] Sequence: {1}{2}{3}{4}{5}{6}{7}{8}{9}", _moduleId, buttonPressOrder[0], buttonPressOrder[1], buttonPressOrder[2], buttonPressOrder[3], buttonPressOrder[4], buttonPressOrder[5], buttonPressOrder[6], buttonPressOrder[7], buttonPressOrder[8]);
+            if (log)
+                Debug.LogFormat("[Unrelated Anagrams #{0}] Sequence: {1}{2}{3}{4}{5}{6}{7}{8}{9}", _moduleId, buttonPressOrder[0], buttonPressOrder[1], buttonPressOrder[2], buttonPressOrder[3], buttonPressOrder[4], buttonPressOrder[5], buttonPressOrder[6], buttonPressOrder[7], buttonPressOrder[8]);
         }
     }
     void resetGame()
@@ -265,7 +273,7 @@ public class unrelatedAnagrams : MonoBehaviour
 
         if (!_pressOrderSet)
         {
-            setupPressOrder();
+            setupPressOrder(true);
             _pressOrderSet = true;
         }
 
@@ -308,6 +316,16 @@ public class unrelatedAnagrams : MonoBehaviour
         resetGame();
         canInteract = true;
     }
+
+    private List<int> AllIndexesOf(string str, string searchstring)
+    {
+        List<int> temp = new List<int>();
+        for (int i = 0; i < searchstring.Length; i++)
+            if (searchstring[i] == str.ToCharArray()[0])
+                temp.Add(i);
+        return temp;
+    }
+
     #pragma warning disable 414
     private string TwitchHelpMessage = "Use !{0} press RAD TUNE to press the buttons with the respective letters. You can also use numbers, the keys are numbered in reading order starting from 1";
     #pragma warning restore 414
@@ -317,9 +335,11 @@ public class unrelatedAnagrams : MonoBehaviour
         if (!command.StartsWith("PRESS")) return null;
 
         command = command.Substring(6);
+        for (int i = 0; i < command.Length; i++)
+            if (!command[i].EqualsAny('U', 'N', 'D', 'E', 'R', 'T', 'A', 'L', '1', '2', '3', '4', '5', '6', '7', '8', '9')) return null;
         List<int> ButtonsPressed = new List<int> { };
         List<KMSelectable> Buttons = new List<KMSelectable> { };
-        if (Regex.IsMatch(command, "([UNDERTAL]\\s*)+"))
+        if (Regex.IsMatch(command, "[UNDERTAL]"))
         {
             foreach (Match buttonIndexString in Regex.Matches(command, "[UNDERTAL]"))
             {
@@ -362,6 +382,33 @@ public class unrelatedAnagrams : MonoBehaviour
 
             if (Buttons.Count == 0) return null;
             else return Buttons.ToArray();
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        setupPressOrder(false);
+        int start = pressIndex;
+        for (int i = start; i < 9; i++)
+        {
+            List<int> temp = AllIndexesOf(buttonPressOrder[i], buttonStrings.Join(""));
+            if (buttonPressOrder[i] == "E")
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    if (!buttonStates[temp[j]])
+                    {
+                        btn[temp[j]].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                btn[temp[0]].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
         }
     }
 }
