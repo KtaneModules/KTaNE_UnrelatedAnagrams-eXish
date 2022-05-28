@@ -334,7 +334,7 @@ public class unrelatedAnagrams : MonoBehaviour
         command = command.Trim().ToUpperInvariant();
         if (!command.StartsWith("PRESS")) return null;
 
-        command = command.Substring(6);
+        command = command.Substring(6).Replace(" ", "");
         for (int i = 0; i < command.Length; i++)
             if (!command[i].EqualsAny('U', 'N', 'D', 'E', 'R', 'T', 'A', 'L', '1', '2', '3', '4', '5', '6', '7', '8', '9')) return null;
         List<int> ButtonsPressed = new List<int> { };
